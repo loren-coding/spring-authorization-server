@@ -36,6 +36,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -280,6 +281,7 @@ public class OidcTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfiguration {
 
 		@Bean
@@ -366,6 +368,7 @@ public class OidcTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration
 	static class AuthorizationServerConfigurationWithTokenGenerator extends AuthorizationServerConfiguration {
 
 		// @formatter:off
@@ -383,8 +386,8 @@ public class OidcTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher));
 

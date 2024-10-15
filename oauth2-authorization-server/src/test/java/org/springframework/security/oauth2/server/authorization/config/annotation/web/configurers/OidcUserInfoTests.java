@@ -38,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -300,7 +301,7 @@ public class OidcUserInfoTests {
 		// @formatter:on
 
 		org.springframework.security.core.context.SecurityContext securityContext =
-				securityContextRepository.loadContext(mvcResult.getRequest()).get();
+				securityContextRepository.loadDeferredContext(mvcResult.getRequest()).get();
 		assertThat(securityContext.getAuthentication()).isNull();
 	}
 
@@ -383,6 +384,7 @@ public class OidcUserInfoTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class CustomUserInfoConfiguration extends AuthorizationServerConfiguration {
 
 		@Bean
@@ -396,8 +398,8 @@ public class OidcUserInfoTests {
 			// @formatter:off
 			http
 				.requestMatcher(endpointsMatcher)
-				.authorizeRequests(authorizeRequests ->
-					authorizeRequests.anyRequest().authenticated()
+				.authorizeHttpRequests(authorize ->
+					authorize.anyRequest().authenticated()
 				)
 				.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
@@ -420,6 +422,7 @@ public class OidcUserInfoTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationWithSecurityContextRepository extends AuthorizationServerConfiguration {
 
 		@Bean
@@ -435,8 +438,8 @@ public class OidcUserInfoTests {
 			// @formatter:off
 			http
 				.requestMatcher(endpointsMatcher)
-				.authorizeRequests(authorizeRequests ->
-					authorizeRequests.anyRequest().authenticated()
+				.authorizeHttpRequests(authorize ->
+					authorize.anyRequest().authenticated()
 				)
 				.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
@@ -450,6 +453,7 @@ public class OidcUserInfoTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfiguration {
 
 		@Bean
@@ -464,8 +468,8 @@ public class OidcUserInfoTests {
 			// @formatter:off
 			http
 				.requestMatcher(endpointsMatcher)
-				.authorizeRequests(authorizeRequests ->
-					authorizeRequests.anyRequest().authenticated()
+				.authorizeHttpRequests(authorize ->
+					authorize.anyRequest().authenticated()
 				)
 				.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 				.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)

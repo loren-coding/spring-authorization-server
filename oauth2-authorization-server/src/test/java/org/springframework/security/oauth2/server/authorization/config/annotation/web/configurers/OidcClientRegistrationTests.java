@@ -38,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -544,6 +545,7 @@ public class OidcClientRegistrationTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class CustomClientRegistrationConfiguration extends AuthorizationServerConfiguration {
 
 		// @formatter:off
@@ -569,8 +571,8 @@ public class OidcClientRegistrationTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
@@ -581,6 +583,7 @@ public class OidcClientRegistrationTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfiguration {
 
 		// @formatter:off
@@ -595,8 +598,8 @@ public class OidcClientRegistrationTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package sample.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -30,14 +31,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * @author Joe Grandja
  */
 @EnableWebSecurity
+@Configuration(proxyBeanMethods = false)
 public class DefaultSecurityConfig {
 
 	// @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
+			.authorizeHttpRequests(authorize ->
+				authorize.anyRequest().authenticated()
 			)
 			.formLogin(withDefaults());
 		return http.build();

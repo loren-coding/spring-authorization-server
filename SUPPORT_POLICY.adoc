@@ -1,4 +1,0 @@
-= Spring Authorization Server Support Policy
-
-The Spring Authorization Server project provides software support through the https://tanzu.vmware.com/support/oss[VMware Tanzu OSS support policy].
-https://tanzu.vmware.com/spring-runtime[Commercial support], which offers an extended support period, is also available from VMware.

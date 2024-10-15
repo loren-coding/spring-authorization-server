@@ -222,8 +222,8 @@ public class OidcProviderConfigurationTests {
 
 	}
 
-	@Configuration
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationWithProviderConfigurationCustomizer extends AuthorizationServerConfiguration {
 
 		// @formatter:off
@@ -243,8 +243,8 @@ public class OidcProviderConfigurationTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher));
 
@@ -259,8 +259,8 @@ public class OidcProviderConfigurationTests {
 
 	}
 
-	@Configuration
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationWithClientRegistrationEnabled extends AuthorizationServerConfiguration {
 
 		// @formatter:off

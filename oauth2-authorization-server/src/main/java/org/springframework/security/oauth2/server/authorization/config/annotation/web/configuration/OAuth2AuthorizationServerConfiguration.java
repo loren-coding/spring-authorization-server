@@ -64,8 +64,8 @@ public class OAuth2AuthorizationServerConfiguration {
 
 		http
 			.requestMatcher(endpointsMatcher)
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
+			.authorizeHttpRequests(authorize ->
+					authorize.anyRequest().authenticated()
 			)
 			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 			.apply(authorizationServerConfigurer);

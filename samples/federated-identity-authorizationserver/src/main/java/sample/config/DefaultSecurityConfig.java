@@ -19,6 +19,7 @@ import sample.security.FederatedIdentityConfigurer;
 import sample.security.UserRepositoryOAuth2UserHandler;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * @since 0.2.3
  */
 @EnableWebSecurity
+@Configuration(proxyBeanMethods = false)
 public class DefaultSecurityConfig {
 
 	// @formatter:off
@@ -41,8 +43,8 @@ public class DefaultSecurityConfig {
 		FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer()
 			.oauth2UserHandler(new UserRepositoryOAuth2UserHandler());
 		http
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests
+			.authorizeHttpRequests(authorize ->
+				authorize
 					.mvcMatchers("/assets/**", "/webjars/**", "/login").permitAll()
 					.anyRequest().authenticated()
 			)

@@ -41,6 +41,7 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -398,6 +399,7 @@ public class OAuth2ClientCredentialsGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationCustomTokenEndpoint extends AuthorizationServerConfiguration {
 		// @formatter:off
 		@Bean
@@ -417,8 +419,8 @@ public class OAuth2ClientCredentialsGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.apply(authorizationServerConfigurer);
@@ -428,6 +430,7 @@ public class OAuth2ClientCredentialsGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationCustomClientAuthentication extends AuthorizationServerConfiguration {
 		// @formatter:off
 		@Bean
@@ -449,8 +452,8 @@ public class OAuth2ClientCredentialsGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.apply(authorizationServerConfigurer);

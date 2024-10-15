@@ -160,8 +160,8 @@ public class OAuth2AuthorizationServerMetadataTests {
 		}
 	}
 
-	@Configuration
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationWithMetadataCustomizer extends AuthorizationServerConfiguration {
 
 		// @formatter:off
@@ -180,8 +180,8 @@ public class OAuth2AuthorizationServerMetadataTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher));
 

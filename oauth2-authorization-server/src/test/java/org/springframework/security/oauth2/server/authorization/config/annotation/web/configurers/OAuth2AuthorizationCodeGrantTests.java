@@ -45,6 +45,7 @@ import org.mockito.ArgumentCaptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -748,8 +749,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 		ArgumentCaptor<org.springframework.security.core.context.SecurityContext> securityContextCaptor =
 				ArgumentCaptor.forClass(org.springframework.security.core.context.SecurityContext.class);
 		verify(securityContextRepository, times(2)).saveContext(securityContextCaptor.capture(), any(), any());
-		securityContextCaptor.getAllValues().forEach(securityContext ->
-				assertThat(securityContext.getAuthentication()).isInstanceOf(UsernamePasswordAuthenticationToken.class));
+		assertThat(securityContextCaptor.getValue().getAuthentication()).isInstanceOf(UsernamePasswordAuthenticationToken.class);
 		reset(securityContextRepository);
 
 		String authorizationCode = extractParameterFromRedirectUri(mvcResult.getResponse().getRedirectedUrl(), "code");
@@ -770,7 +770,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 				.andReturn();
 
 		org.springframework.security.core.context.SecurityContext securityContext =
-				securityContextRepository.loadContext(mvcResult.getRequest()).get();
+				securityContextRepository.loadDeferredContext(mvcResult.getRequest()).get();
 		assertThat(securityContext.getAuthentication()).isNull();
 	}
 
@@ -898,6 +898,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationWithSecurityContextRepository extends AuthorizationServerConfiguration {
 		// @formatter:off
 		@Bean
@@ -908,8 +909,8 @@ public class OAuth2AuthorizationCodeGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.securityContext(securityContext ->
@@ -957,6 +958,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationCustomConsentPage extends AuthorizationServerConfiguration {
 		// @formatter:off
 		@Bean
@@ -970,8 +972,8 @@ public class OAuth2AuthorizationCodeGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.apply(authorizationServerConfigurer);
@@ -981,6 +983,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationCustomConsentRequest extends AuthorizationServerConfiguration {
 
 		@Autowired
@@ -998,8 +1001,8 @@ public class OAuth2AuthorizationCodeGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.apply(authorizationServerConfigurer);
@@ -1070,6 +1073,7 @@ public class OAuth2AuthorizationCodeGrantTests {
 	}
 
 	@EnableWebSecurity
+	@Configuration(proxyBeanMethods = false)
 	static class AuthorizationServerConfigurationCustomAuthorizationEndpoint extends AuthorizationServerConfiguration {
 		// @formatter:off
 		@Bean
@@ -1089,8 +1093,8 @@ public class OAuth2AuthorizationCodeGrantTests {
 
 			http
 					.requestMatcher(endpointsMatcher)
-					.authorizeRequests(authorizeRequests ->
-							authorizeRequests.anyRequest().authenticated()
+					.authorizeHttpRequests(authorize ->
+							authorize.anyRequest().authenticated()
 					)
 					.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
 					.apply(authorizationServerConfigurer);

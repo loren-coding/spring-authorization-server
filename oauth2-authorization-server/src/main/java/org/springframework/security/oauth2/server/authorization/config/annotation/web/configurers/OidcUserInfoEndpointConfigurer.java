@@ -40,7 +40,7 @@ import org.springframework.security.oauth2.server.authorization.oidc.authenticat
 import org.springframework.security.oauth2.server.authorization.oidc.web.OidcUserInfoEndpointFilter;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -221,7 +221,7 @@ public final class OidcUserInfoEndpointConfigurer extends AbstractOAuth2Configur
 		if (this.errorResponseHandler != null) {
 			oidcUserInfoEndpointFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
 		}
-		httpSecurity.addFilterAfter(postProcess(oidcUserInfoEndpointFilter), FilterSecurityInterceptor.class);
+		httpSecurity.addFilterAfter(postProcess(oidcUserInfoEndpointFilter), AuthorizationFilter.class);
 	}
 
 	@Override

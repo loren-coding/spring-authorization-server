@@ -15,7 +15,8 @@ The project board can be accessed https://github.com/orgs/spring-projects/projec
 The feature list can be viewed in the https://docs.spring.io/spring-authorization-server/docs/current/reference/html/overview.html#feature-list[reference documentation].
 
 == Support Policy
-The Spring Authorization Server project provides software support and is documented in its link:SUPPORT_POLICY.adoc[support policy].
+The Spring Authorization Server project provides software support through the https://tanzu.vmware.com/support/oss[VMware Tanzu OSS support policy].
+https://tanzu.vmware.com/spring-runtime[Commercial support], which offers an extended support period, is also available from VMware.
 
 == Getting Started
 The first place to start is to read the https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1-07[OAuth 2.1 Authorization Framework] to gain an in-depth understanding on how to build an Authorization Server.
@@ -51,9 +52,9 @@ In the instructions below, https://vimeo.com/34436402[`./gradlew`] is invoked fr
 a cross-platform, self-contained bootstrap mechanism for the build.
 
 === Prerequisites
-https://help.github.com/set-up-git-redirect[Git] and the https://www.oracle.com/technetwork/java/javase/downloads[JDK8 build].
+https://help.github.com/set-up-git-redirect[Git] and the https://www.oracle.com/technetwork/java/javase/downloads[jdk11 build].
 
-Be sure that your `JAVA_HOME` environment variable points to the `jdk1.8.0` folder extracted from the JDK download.
+Be sure that your `JAVA_HOME` environment variable points to the `jdk11` folder extracted from the JDK download.
 
 === Check out sources
 [indent=0]

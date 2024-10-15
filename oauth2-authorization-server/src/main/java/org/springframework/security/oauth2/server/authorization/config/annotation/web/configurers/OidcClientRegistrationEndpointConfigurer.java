@@ -36,7 +36,7 @@ import org.springframework.security.oauth2.server.authorization.oidc.web.OidcCli
 import org.springframework.security.oauth2.server.authorization.oidc.web.authentication.OidcClientRegistrationAuthenticationConverter;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.web.authentication.DelegatingAuthenticationConverter;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -197,7 +197,7 @@ public final class OidcClientRegistrationEndpointConfigurer extends AbstractOAut
 		if (this.errorResponseHandler != null) {
 			oidcClientRegistrationEndpointFilter.setAuthenticationFailureHandler(this.errorResponseHandler);
 		}
-		httpSecurity.addFilterAfter(postProcess(oidcClientRegistrationEndpointFilter), FilterSecurityInterceptor.class);
+		httpSecurity.addFilterAfter(postProcess(oidcClientRegistrationEndpointFilter), AuthorizationFilter.class);
 	}
 
 	@Override

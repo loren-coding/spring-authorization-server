@@ -4,7 +4,7 @@ plugins {
 	id "groovy"
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
 	gradlePluginPortal()
@@ -23,5 +23,5 @@ dependencies {
 	implementation "org.hidetake:gradle-ssh-plugin:2.10.1"
 	implementation "org.jfrog.buildinfo:build-info-extractor-gradle:4.29.0"
 	implementation "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
-	implementation "org.springframework:spring-core:5.3.30"
+	implementation "org.springframework:spring-core:5.3.39"
 }
