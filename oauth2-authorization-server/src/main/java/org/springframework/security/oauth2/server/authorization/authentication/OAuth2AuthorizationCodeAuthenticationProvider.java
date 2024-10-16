@@ -29,7 +29,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClaimAccessor;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -142,6 +141,21 @@ public final class OAuth2AuthorizationCodeAuthenticationProvider implements Auth
 		}
 
 		if (!authorizationCode.isActive()) {
+			if (authorizationCode.isInvalidated()) {
+				OAuth2Authorization.Token<? extends OAuth2Token> token = (authorization.getRefreshToken() != null)
+						? authorization.getRefreshToken() : authorization.getAccessToken();
+				if (token != null) {
+					// Invalidate the access (and refresh) token as the client is
+					// attempting to use the authorization code more than once
+					authorization = OAuth2AuthenticationProviderUtils.invalidate(authorization, token.getToken());
+					this.authorizationService.save(authorization);
+					if (this.logger.isWarnEnabled()) {
+						this.logger.warn(LogMessage.format(
+								"Invalidated authorization token(s) previously issued to registered client '%s'",
+								registeredClient.getId()));
+					}
+				}
+			}
 			throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
 		}
 
@@ -149,10 +163,12 @@ public final class OAuth2AuthorizationCodeAuthenticationProvider implements Auth
 			this.logger.trace("Validated token request parameters");
 		}
 
+		Authentication principal = authorization.getAttribute(Principal.class.getName());
+
 		// @formatter:off
 		DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
 				.registeredClient(registeredClient)
-				.principal(authorization.getAttribute(Principal.class.getName()))
+				.principal(principal)
 				.authorizationServerContext(AuthorizationServerContextHolder.getContext())
 				.authorization(authorization)
 				.authorizedScopes(authorization.getAuthorizedScopes())
@@ -181,30 +197,31 @@ public final class OAuth2AuthorizationCodeAuthenticationProvider implements Auth
 		if (generatedAccessToken instanceof ClaimAccessor) {
 			authorizationBuilder.token(accessToken, (metadata) ->
 					metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, ((ClaimAccessor) generatedAccessToken).getClaims()));
-		} else {
+		}
+		else {
 			authorizationBuilder.accessToken(accessToken);
 		}
 
 		// ----- Refresh token -----
 		OAuth2RefreshToken refreshToken = null;
-		if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN) &&
-				// Do not issue refresh token to public client
-				!clientPrincipal.getClientAuthenticationMethod().equals(ClientAuthenticationMethod.NONE)) {
-
+		// Do not issue refresh token to public client
+		if (registeredClient.getAuthorizationGrantTypes().contains(AuthorizationGrantType.REFRESH_TOKEN)) {
 			tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
 			OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
-			if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
-				OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
-						"The token generator failed to generate the refresh token.", ERROR_URI);
-				throw new OAuth2AuthenticationException(error);
-			}
+			if (generatedRefreshToken != null) {
+				if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
+					OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
+							"The token generator failed to generate a valid refresh token.", ERROR_URI);
+					throw new OAuth2AuthenticationException(error);
+				}
 
-			if (this.logger.isTraceEnabled()) {
-				this.logger.trace("Generated refresh token");
-			}
+				if (this.logger.isTraceEnabled()) {
+					this.logger.trace("Generated refresh token");
+				}
 
-			refreshToken = (OAuth2RefreshToken) generatedRefreshToken;
-			authorizationBuilder.refreshToken(refreshToken);
+				refreshToken = (OAuth2RefreshToken) generatedRefreshToken;
+				authorizationBuilder.refreshToken(refreshToken);
+			}
 		}
 
 		// ----- ID token -----
@@ -231,7 +248,8 @@ public final class OAuth2AuthorizationCodeAuthenticationProvider implements Auth
 					generatedIdToken.getExpiresAt(), ((Jwt) generatedIdToken).getClaims());
 			authorizationBuilder.token(idToken, (metadata) ->
 					metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, idToken.getClaims()));
-		} else {
+		}
+		else {
 			idToken = null;
 		}
 
